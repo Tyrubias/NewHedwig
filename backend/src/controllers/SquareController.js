@@ -67,7 +67,9 @@ class SquareController {
 
         let imageData
         try {
-          const response = await catalogApi.retrieveCatalogObject(imageId)
+          const response = await this.squareClient.catalogApi.retrieveCatalogObject(
+            imageId
+          )
           imageData = response.result.object.imageData.url
         } catch (error) {
           imageData = null
@@ -111,7 +113,7 @@ class SquareController {
     try {
       const {
         result: { object }
-      } = await this.squareClient.catalogApi.retrieveCatalogObject(dataSourceId)
+      } = await this.squareClient.catalogApi.retrieveCatalogObject(itemId)
 
       const {
         imageId,
@@ -128,7 +130,9 @@ class SquareController {
 
       let imageData
       try {
-        const response = await catalogApi.retrieveCatalogObject(imageId)
+        const response = await this.squareClient.catalogApi.retrieveCatalogObject(
+          imageId
+        )
         imageData = response.result.object.imageData.url
       } catch (error) {
         imageData = null
@@ -452,15 +456,15 @@ class SquareController {
     } catch (error) {
       if (error instanceof ApiError) {
         throw new ApolloError(
-          `Completing payment ${
-            args.paymentId
-          } using Square failed because ${JSON.stringify(error.result)}`
+          `Completing payment ${paymentId} using Square failed because ${JSON.stringify(
+            error.result
+          )}`
         )
       } else {
         throw new ApolloError(
-          `Something went wrong when completing payment ${
-            args.paymentId
-          }: ${JSON.stringify(error)}`
+          `Something went wrong when completing payment ${paymentId}: ${JSON.stringify(
+            error
+          )}`
         )
       }
     }
@@ -622,7 +626,7 @@ class SquareController {
         currency: priceMoney ? priceMoney.currency : 'USD'
       },
       name: itemVariationName,
-      dataSource,
+      dataSource: 'SQUARE',
       merchant: ''
     }
   }
@@ -690,7 +694,7 @@ class SquareController {
             currency: priceMoney ? priceMoney.currency : 'USD'
           },
           name: modifierName,
-          dataSource,
+          dataSource: 'SQUARE',
           merchant: ''
         }
       })

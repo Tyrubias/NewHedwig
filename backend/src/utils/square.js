@@ -10,11 +10,11 @@ const squareControllers = await Vendor.find()
     )
   )
 
-  /**
-   * 
-   * @param {string} vendorName 
-   * @returns
-   */
+/**
+ *
+ * @param {string} vendorName
+ * @returns
+ */
 const getSquare = vendorName =>
   squareControllers.filter(
     squareController => squareController.vendorName === vendorName

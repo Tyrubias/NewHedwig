@@ -35,13 +35,10 @@ ItemTC.addResolver({
 
 const ItemQueries = {
   getCatalog: ItemTC.getResolver('getCatalog'),
-  getItem: ItemTC.getResolver('getItem'),
-  getAvailability: ItemTC.getResolver('getAvailabilities')
+  getItem: ItemTC.getResolver('getItem')
 }
 
-const ItemMutations = {
-  setAvailability: ItemTC.getResolver('setAvailability')
-}
+const ItemMutations = {}
 
 const ItemSubscriptions = {
   availabilityChanged: {
