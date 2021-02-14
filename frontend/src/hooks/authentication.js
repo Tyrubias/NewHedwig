@@ -1,13 +1,21 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+
 import firebase from 'firebase/app'
 import 'firebase/auth'
-import moment from 'moment'
 
-function useInitialAuthentication () {
+import { useMutation } from '@apollo/client'
+
+import getInitApolloClient from '../graphql/apollo'
+import { AUTHENTICATE_USER } from '../graphql/Mutations'
+
+function useInitAuth () {
   const navigate = useNavigate()
+
   const [loggedIn, setLoggedIn] = useState(false)
   const [loading, setLoading] = useState(true)
+
+  const [authenticateUser, { data }] = useMutation(AUTHENTICATE_USER)
 
   useEffect(() => {
     async function handleAuthFlow () {
@@ -19,22 +27,44 @@ function useInitialAuthentication () {
       const redirectResult = await firebase.auth().getRedirectResult()
 
       if (redirectResult.user && redirectResult.additionalUserInfo) {
-        const idTokenResult = await redirectResult.user.getIdTokenResult()
+        getInitApolloClient() // This will initialize Apollo
 
-        window.localStorage.setItem('token', idTokenResult.token)
-        window.localStorage.setItem(
-          'expirationTime',
-          moment(idTokenResult.expirationTime).format()
-        )
+        await authenticateUser({
+          variables: { idToken: await redirectResult.user.getIdToken() }
+        })
+
+        window.localStorage.setItem('userProfile', JSON.stringify(data))
+
+        setLoggedIn(true)
+
+        if (data.vendor) {
+          navigate('/vendor_choice')
+        }
+
+        if (/^[0-9]{10}$/.test(data.phone)) {
+          navigate('/eat')
+        }
+
+        navigate('/contact')
       } else {
         setLoading(false)
       }
     }
 
     function checkLoggedIn () {
-      return firebase.auth().onAuthStateChanged(user => {
+      firebase.auth().onAuthStateChanged(user => {
         if (user) {
           setLoggedIn(true)
+
+          if (data.vendor) {
+            navigate('/vendor_choice')
+          }
+
+          if (/^[0-9]{10}$/.test(data.phone)) {
+            navigate('/eat')
+          }
+
+          navigate('/contact')
         }
       })
     }
@@ -44,3 +74,25 @@ function useInitialAuthentication () {
 
   return { loggedIn, loading }
 }
+
+function useAuth () {
+  const [loggedIn, setLoggedIn] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const checkLoggedIn = async () => {
+      // Uses firebase's tool to check whether the user is logged in or not
+      return firebase.auth().onAuthStateChanged(user => {
+        if (user) {
+          setLoggedIn(true)
+        }
+        setLoading(false)
+      })
+    }
+    checkLoggedIn()
+  }, [])
+
+  return { loggedIn, loading }
+}
+
+export { useInitAuth, useAuth }

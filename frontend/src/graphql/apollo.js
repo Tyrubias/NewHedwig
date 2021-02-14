@@ -10,6 +10,8 @@ import { GRAPHQL_URL, GRAPHQL_WS_URL } from '../config'
 import firebase from 'firebase'
 import 'firebase/auth'
 
+let apolloClient
+
 function createApolloClient () {
   const authLink = setContext(async (_, { headers }) => {
     const token = await firebase.auth().currentUser.getIdToken()
@@ -30,15 +32,54 @@ function createApolloClient () {
     uri: GRAPHQL_WS_URL,
     options: {
       reconnect: true,
-      connectionParams: getWebSocketParams()
+      connectionParams: (async () => ({
+        authToken: await firebase.auth().currentUser.getIdToken()
+      }))()
     }
+  })
+
+  const splitLink = split(
+    ({ query }) => {
+      const definition = getMainDefinition(query)
+      return (
+        definition.kind === 'OperationDefinition' &&
+        definition.operation === 'subscription'
+      )
+    },
+    wsLink,
+    httpLink
+  )
+
+  const cache = new InMemoryCache({
+    typePolicies: {
+      Subscription: {
+        fields: {
+          orderUpdated: {
+            merge (_existing, incoming) {
+              return incoming
+            }
+          }
+        }
+      }
+    }
+  })
+
+  return new ApolloClient({
+    cache: cache,
+    link: authLink.concat(splitLink)
   })
 }
 
-async function getWebSocketParams() {
-  const token = await firebase.auth().currentUser.getIdToken()
-
-  return {
-    authToken: token
+/**
+ *
+ * @returns {ApolloClient<import('@apollo/client').NormalizedCacheObject>}
+ */
+function getInitApolloClient () {
+  if (!apolloClient) {
+    apolloClient = createApolloClient()
   }
+
+  return apolloClient
 }
+
+export default getInitApolloClient
