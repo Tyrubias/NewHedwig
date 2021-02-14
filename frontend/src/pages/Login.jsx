@@ -7,7 +7,7 @@ import {
 } from '../styles/Login.styles'
 import logo from '../images/HedwigLogoFinal_02.svg'
 
-import { SmallLoadingPage } from '../components/LoadingComponents'
+import { LoadingPage } from '../components/LoadingComponents'
 
 import { useInitAuth } from '../hooks/authentication'
 
@@ -37,7 +37,7 @@ function Login () {
           </MainDiv>
           )
         : (
-          <SmallLoadingPage />
+          <LoadingPage />
           )}
     </>
   )
