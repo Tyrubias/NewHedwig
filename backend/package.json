@@ -1,6 +1,7 @@
 {
   "name": "hedwig-backend",
   "version": "1.0.0",
+  "private": true,
   "description": "The Apollo GraphQL backend for Hedwig",
   "repository": {
     "type": "git"
@@ -15,16 +16,16 @@
   "author": "team.riceapps@gmail.com",
   "license": "MIT",
   "dependencies": {
-    "apollo-server-express": "^2.19.2",
+    "apollo-server-express": "^2.21.0",
     "dotenv": "^8.2.0",
     "firebase-admin": "^9.4.2",
     "graphql": "^14.3.0",
-    "graphql-compose": "^7.24.4",
-    "graphql-compose-mongoose": "^9.0.1",
+    "graphql-compose": "^7.25.0",
+    "graphql-compose-mongoose": "^9.1.0",
     "graphql-redis-subscriptions": "^2.3.1",
     "ioredis": "^4.22.0",
-    "mongoose": "^5.11.15",
-    "shopify-api-node": "^3.6.3",
+    "mongoose": "^5.11.16",
+    "shopify-api-node": "^3.6.5",
     "shopify-buy": "^2.11.0",
     "square": "^8.1.1",
     "twilio": "^3.55.1"
